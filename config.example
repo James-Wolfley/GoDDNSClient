@@ -1,15 +1,11 @@
 {
-  "email": "EMAIL ADDRESS",
-  "token": "API ACCESS TOKEN",
-  "current-ip": "0.0.0.0",
-  "domains": [
-    {
-      "name": "DOMAIN RECORD NAME",
-      "zone": "DOMAIN ZONE TOKEN"
-    },
-    {
-      "name": "DOMAIN RECORD NAME",
-      "zone": "DOMAIN ZONE TOKEN"
-    }
-  ]
+	"email": "Account Email Address",
+	"token": "Account API Access Token",
+	"current-ip": "0.0.0.0",
+	"domains": [
+		{
+			"name": "www.yoursitehere.com-CHANGETHIS",
+			"zone": "The Site Zone"
+		}
+	]
 }

@@ -59,32 +59,45 @@ func main(){
 
 	config, err := readFile(ConfigName)
 	if err != nil {
-		fmt.Printf("Failed to unmarshal the json data: %v", err) 
+		fmt.Printf("Failed to unmarshal the json data: %v", err)
+		return
 	}
 
 	if IPAddress != "0.0.0.0"{
 		config.CurrentIP = IPAddress
+		fmt.Printf("Ip address set to: %v\n", IPAddress)
 	}
 	if SiteEmail != "default@default.com"{
 		config.Email = SiteEmail
+		fmt.Printf("Email set to: %v\n", SiteEmail)
 	}
 	if SiteAPIToken != "API Access token"{
 		config.Token = SiteAPIToken
+		fmt.Printf("Access token set to: %v\n", SiteAPIToken)
 	}
 
 	if AddSite {
+		if SiteName == "" || SiteZone == ""{
+			fmt.Println("You must include both a site-name and site-zone when using the add-site flag.")
+			return
+		}
+		fmt.Printf("Adding site %s with zone token %s.\n", SiteName, SiteZone)
 		config.Domains = append(config.Domains, dom{Name: SiteName, Zone: SiteZone})
 		if config.Domains[0].Name == "www.yoursitehere.com-CHANGETHIS"{
-			removeSlice(config.Domains, 0)
+			config.Domains = removeSlice(config.Domains, 0)
 		}
+		writeFile(config, ConfigName)
+		return
 	}
+	ipAddress := getCurrentIP()
+	writeFile(config, ConfigName)
 
 	if config.Email == "default@default.com" || config.Token == "API Access token" || len(config.Domains) == 0 || config.Domains[0].Name == "www.yoursitehere.com-CHANGETHIS"{
 		fmt.Println("Your config still has default values, please finish the config.")
+		return
 	}
 
-	ipAddress := getCurrentIP()
-	writeFile(config, "config.json")
+	
 	if ipAddress != config.CurrentIP{
 		config.CurrentIP = ipAddress
  		updateDNSRecords(config)
