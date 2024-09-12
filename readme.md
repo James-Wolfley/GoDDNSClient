@@ -35,6 +35,9 @@ These agurments can be used to change values in the configuration file via the c
 - **-add-site**
   - Type : Flag
   - Description : Set this to true to add a new site to the config, must be used in conjunction with site-name and site-zone.
+- **-force**
+  - Type : Flage
+  - Description : Set this to force the update regardless if the config has the current IP address.
 - **-reset-config**
   - Type : Flag
   - Description : Set this to true to reset the config to the default. **_This will overwrite everything. Make sure to make backups if you wish to save parts of the old config._**
