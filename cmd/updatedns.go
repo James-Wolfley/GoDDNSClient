@@ -11,15 +11,10 @@ import (
 // updatednsCmd represents the updatedns command
 var updatednsCmd = &cobra.Command{
 	Use:   "updatedns",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Forces update of dns records.",
+	Long: `Updates the dns records of all configured sites regardless of whether it matches the currently reported dns record.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		app.UpdateDnsRecords(path)
+		app.UpdateDnsRecords(path, true)
 	},
 }
 

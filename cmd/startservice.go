@@ -19,13 +19,13 @@ var startserviceCmd = &cobra.Command{
 	Long: `Runs a service until shutdown that monitors for ip changes and updates dns records as needed.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for{
-			app.UpdateDnsRecords(path)
-			time.Sleep(time.Minute * time.Duration(interval))
+			app.UpdateDnsRecords(path, false)
+			time.Sleep(time.Second * time.Duration(interval))
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(startserviceCmd)
-	startserviceCmd.Flags().IntVarP(&interval, "interval", "i", 15, "The interval to check for updates in minutes.")
+	startserviceCmd.Flags().IntVarP(&interval, "interval", "i", 900, "The interval to check for updates in seconds.")
 }

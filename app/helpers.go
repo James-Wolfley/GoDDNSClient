@@ -12,7 +12,7 @@ import (
 	"github.com/cloudflare/cloudflare-go"
 )
 
-func UpdateDnsRecords(path string){
+func UpdateDnsRecords(path string, force bool){
 	c := LoadConfigFile(path)
 	c.CurrentIp = GetCurrentIp()
 	api, err := cloudflare.NewWithAPIToken(c.ApiKey)
@@ -20,22 +20,21 @@ func UpdateDnsRecords(path string){
 		fmt.Printf("Failed to get cloudflare api access.\nGot error %s\n", err)
 		os.Exit(2)
 	}
-	ctx := context.Background()
 	for i, s := range c.Sites {
-		rc := cloudflare.ResourceContainer{
-			Level: cloudflare.ZoneRouteLevel,
-			Identifier: s.ZoneId,
+		if c.CurrentIp != s.IP || force {
+			rc := cloudflare.ResourceContainer{
+				Level: cloudflare.ZoneRouteLevel,
+				Identifier: s.ZoneId,
+			}
+			c.Sites[i].IP = c.CurrentIp
+			rp := cloudflare.UpdateDNSRecordParams{
+				Content: c.CurrentIp,
+			}
+			api.UpdateDNSRecord(context.Background(), &rc, rp)
+			fmt.Printf("Updated %s with ip %s\n", s.URI, c.Sites[i].IP)
+		} else {
+			fmt.Printf("%s's address was already up to date.\n", s.URI)
 		}
-		dnsrecord, err := api.GetDNSRecord(ctx, &rc, s.RecordId)
-		if err != nil {
-			fmt.Printf("Failed to get dns record %s.\nGot error %s", s.RecordId, err)
-		}
-		c.Sites[i].IP = dnsrecord.Content
-		rp := cloudflare.UpdateDNSRecordParams{
-			Name: s.URI,
-		}
-		api.UpdateDNSRecord(context.Background(), &rc, rp)
-		fmt.Printf("Updated %s with ip %s\n", s.URI, c.Sites[i].IP)
 	}
 	c.SaveConfigFile(path)
 }
