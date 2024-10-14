@@ -12,7 +12,7 @@ import (
 	"github.com/cloudflare/cloudflare-go"
 )
 
-func UpdateIPFromCloudflare(path string){
+func UpdateDnsRecords(path string){
 	c := LoadConfigFile(path)
 	c.CurrentIp = GetCurrentIp()
 	api, err := cloudflare.NewWithAPIToken(c.ApiKey)
@@ -31,6 +31,11 @@ func UpdateIPFromCloudflare(path string){
 			fmt.Printf("Failed to get dns record %s.\nGot error %s", s.RecordId, err)
 		}
 		c.Sites[i].IP = dnsrecord.Content
+		rp := cloudflare.UpdateDNSRecordParams{
+			Name: s.URI,
+		}
+		api.UpdateDNSRecord(context.Background(), &rc, rp)
+		fmt.Printf("Updated %s with ip %s\n", s.URI, c.Sites[i].IP)
 	}
 	c.SaveConfigFile(path)
 }
