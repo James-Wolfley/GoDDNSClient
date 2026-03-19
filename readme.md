@@ -1,67 +1,105 @@
 # GoDDNSClient
 
-This is a simple command line tool used to update DNS records. It was created to ease the pain of hosting things from a residential connection where a dynamic IP address is common (atleast in USA). Currently only cloudflare is supported.
+A lightweight command-line dynamic DNS client for updating Cloudflare DNS records when your public IP changes.
 
-## How to use?
+This project was built for self-hosted services running on residential internet connections where the external IP address may change over time. The client is designed to be simple, scriptable, and easy to run on a schedule through cron on Linux or Task Scheduler on Windows. It only updates records when the IP changes, unless forced manually.
 
-The indended way to use this tool is to have something else run it periodically (EG Chrontab for linux or Task Scheduler for windows). It only updates the records if your IP address changes from what is in its included config file.
+## Features
 
-## Setup
+- Updates Cloudflare DNS records from the command line
+- Stores the last known IP in a local config file
+- Avoids unnecessary updates when the IP has not changed
+- Supports multiple domains in a single configuration
+- Can be scheduled to run automatically on Linux or Windows
+- Includes command-line options for configuration and maintenance
 
-At a minimum you need to configure the email, api access token and atleast one domain's name and zone id.
+## Why I Built It
 
-### Email
+I wanted a simple dynamic DNS updater for self-hosted environments without relying on a heavier third-party client. This tool was made to fit into a home lab workflow and to work cleanly with scheduled execution.
 
-The email is the account that has the authority to change the DNS record. Typically this is the email you login with.
+## Current Support
 
-### API Access Token
+- Cloudflare DNS
 
-This is the access token that you can find in your account on <a href="https://dash.cloudflare.com/profile/api-tokens">Cloudflare's Dashboard</a>
+## Planned Improvements
 
-### Domain Name
+- Additional DNS provider support
+- Better logging and output formatting
+- Improved validation and setup flow
 
-The domain name to be updated. This is whatever the A record is. If the base domain is example.com and you want to update www.example.com you would put www.example.com here.
+## Build
 
-### Domain Zone Id
+Clone the repository and build with Go:
 
-This can be found on your domains dashboard in the lower right side.
+```bash
+go build -o GoDDNSClient
+```
 
-![Screenshot of where the Zone ID can be found on your domains dashboard.](images/Zone-ID-Image.png)
+## Quick Start
 
-## Command Arguments
+1. Create a Cloudflare API token with permission to edit DNS records.
+2. Find the Zone ID for the domain you want to update.
+3. Configure the application using `config.json` or command-line arguments.
+4. Run the client manually or schedule it to run periodically.
 
-These agurments can be used to change values in the configuration file via the command line.
+## Configuration
 
-- **-add-site**
-  - Type : Flag
-  - Description : Set this to true to add a new site to the config, must be used in conjunction with site-name and site-zone.
-- **-force**
-  - Type : Flag
-  - Description : Set this to force the update regardless if the config has the current IP address.
-- **-reset-config**
-  - Type : Flag
-  - Description : Set this to true to reset the config to the default. **_This will overwrite everything. Make sure to make backups if you wish to save parts of the old config._**
-- **-config-name**
-  - Type : String
-  - Description : The name of the config file you want to use. Defaults to config.json (default "config.json")
-- **-email**
-  - Type : String
-  - Description : Sets the email in the config file (default "default@default.com")
-- **-ip**
-  - Type : String
-  - Description : A string representing the IP address you want to start this with, will be overwritten by the current one. (default "0.0.0.0"). If you use this everytime you can just mandate a specific IP address regardless of what IP the machine has.
-- **-site-name**
-  - Type : String
-  - Description : Used in conjuction with add-site to configure the site name
-- **-site-zone**
-  - Type : String
-  - Description : Used in conjuction with add-site to configure the site zone
-- **-token**
-  - Type : String
-  - Description : Sets the API access token in the config file (default "API Access token")
+Example:
 
-### Config File
+```json
+{
+  "email": "Account Email Address",
+  "token": "Account API Access Token",
+  "current-ip": "0.0.0.0",
+  "domains": [
+    {
+      "name": "www.yoursitehere.com",
+      "zone": "The Site Zone"
+    }
+  ]
+}
+```
 
-This is the configuration which is standard JSON. The domains is a list of all the domains you want to be updated by this application. You can modify this directly if you do not wish to use the command line arguments.</br>
+## Usage
 
-![Sceenshot of the default configuration file](/images/image.png)
+Run:
+
+```bash
+./GoDDNSClient
+```
+
+## Example Commands
+
+Set account info:
+
+```bash
+./GoDDNSClient -email you@example.com -token your_token_here
+```
+
+Add a site:
+
+```bash
+./GoDDNSClient -add-site -site-name www.example.com -site-zone your_zone_id
+```
+
+Force update:
+
+```bash
+./GoDDNSClient -force
+```
+
+## Automation
+
+### Linux cron
+
+```cron
+*/5 * * * * /path/to/GoDDNSClient
+```
+
+### Windows Task Scheduler
+
+Create a scheduled task to run the executable at your desired interval.
+
+## Notes
+
+Useful for home labs, self-hosted services, and environments where DNS must follow a changing public IP.
